@@ -6,7 +6,13 @@ from scipy.fftpack import fft
 # Capture Audio from Microphone
 def capture_audio(seconds=3, rate=44100):
     p = pyaudio.PyAudio()
-    stream = p.open(format=pyaudio.paInt16, channels=1, rate=rate, input=True, frames_per_buffer=1024)
+    try:
+        stream = p.open(format=pyaudio.paInt16, channels=1, rate=rate, input=True, frames_per_buffer=1024)
+    except IOError as e:
+        print("Error opening audio stream. Make sure your microphone is connected and working properly.")
+        print("Error message:", str(e))
+        p.terminate()
+        return None, None   
     print("Recording...")
     frames = []
     for i in range(0, int(rate / 1024 * seconds)):
@@ -20,10 +26,17 @@ def capture_audio(seconds=3, rate=44100):
 
 # Basic Pitch Detection
 def detect_pitch(audio, rate):
+    if audio is None:
+        return None
     spectrum = np.abs(fft(audio))
     frequencies = np.linspace(0, rate, len(spectrum))
     peak = np.argmax(spectrum)
-    return frequencies[peak]
+    detected_frequency = frequencies[peak]
+    if detected_frequency < 20:  # You can adjust this threshold as needed
+        print("Detected frequency is too low. Make sure you are not recording silence.")
+        return None
+    return detected_frequency
+
 
 # Map Frequency to Piano Note
 def frequency_to_note(frequency):
@@ -39,7 +52,11 @@ def frequency_to_note(frequency):
 # Main Program
 def main():
     audio, rate = capture_audio()
+    if audio is None or rate is None:
+        return
     frequency = detect_pitch(audio, rate)
+    if frequency is None:
+        return
     note = frequency_to_note(frequency)
     print("Detected note:", note)
 
