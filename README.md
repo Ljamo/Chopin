@@ -26,6 +26,6 @@ pip install pyaudio numpy scipy
 
 Run the program with:
 ```
-python3 chopin.py
+Start.bat
 ```
-Ensure you have a microphone working and plugged in
+Ensure you have a microphone working and plugged in  -Untested
