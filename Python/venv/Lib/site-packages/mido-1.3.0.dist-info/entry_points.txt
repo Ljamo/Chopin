@@ -1,0 +1,5 @@
+[console_scripts]
+mido-connect = scripts.mido_connect:main
+mido-play = scripts.mido_play:main
+mido-ports = scripts.mido_ports:main
+mido-serve = scripts.mido_serve:main
